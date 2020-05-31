@@ -7,7 +7,8 @@ from PIL import Image, ImageDraw, ImageChops
 
 def create_population(num_individuals, size, num_sides):
     population = np.zeros((num_individuals, 2 * num_sides + 4))
-    population[:, :2 * num_sides] = np.random.randint(size[0], size=population[:, :2 * num_sides].shape)
+    population[:, ::2] = np.random.randint(size[0], size=population[:, ::2].shape)
+    population[:, 1::2] = np.random.randint(size[1], size=population[:, 1::2].shape)
     population[:, 2 * num_sides:] = np.random.randint(256, size=population[:, 2 * num_sides:].shape)
     return population
 
@@ -25,7 +26,10 @@ def render_image(population, size, num_sides):
 def change_individual(individual, size, num_sides):
     random_pos = np.random.randint(len(individual))
     if random_pos < 2 * num_sides:
-        individual[random_pos] = np.random.randint(size[0])
+        if random_pos % 2 == 0:
+            individual[random_pos] = np.random.randint(size[0])
+        else:
+            individual[random_pos] = np.random.randint(size[1])
     else:
         individual[random_pos] = np.random.randint(256)
     return individual
