@@ -2,6 +2,8 @@ import numpy as np
 import os
 import shutil
 import argparse
+import matplotlib.pyplot as plt
+import time
 from PIL import Image, ImageDraw, ImageChops
 
 
@@ -48,6 +50,14 @@ def compute_similarity(target, output, max_difference):
     return similarity
 
 
+def get_time_elapsed(start):
+    end = time.time()
+    seconds = round(end - start)
+    hours, seconds = seconds // 3600, seconds % 3600
+    minutes, seconds = seconds // 60, seconds % 60
+    return hours, minutes, seconds
+
+
 def main(params):
 
     # Unpack parameters
@@ -56,6 +66,7 @@ def main(params):
     num_iterations = params['num_iterations']
     image = params['image']
     verbose = params['verbose']
+    plot = params['plot']
     directory = params['directory']
 
     # Load target
@@ -75,7 +86,22 @@ def main(params):
     # Main loop
     iteration = 0
     changes = 0
-    print_iteration = num_iterations // 10  # Print stats and store temporal image each print_interations
+    print_iteration = 10000
+    plot_iteration = 100
+
+    if plot:
+        # plt.ion()
+        fig = plt.figure(figsize=(6, 3))
+        ax1 = fig.add_subplot(121)
+        ax1.imshow(target)
+        plt.axis('off')
+        ax2 = fig.add_subplot(122)
+        updated_image = ax2.imshow(image)
+        plt.axis('off')
+        fig.subplots_adjust(wspace=0, hspace=0)
+        plt.suptitle(f"Iterations: {iteration}  Changes: {changes}  Similarity: {similarity:.02f}%")
+        text = plt.text(0, 285, f'Time: 10:00:00', fontsize=12, horizontalalignment='center')
+        start = time.time()
 
     while iteration <= num_iterations:
         new_population = change_population(population, size, num_sides)
@@ -88,9 +114,16 @@ def main(params):
             changes += 1
         if iteration % print_iteration == 0 and verbose:
             image.save(f'{directory}/run/output_{iteration}.png')
-            print(f"Iteration: {iteration}  Changes: {changes}  Similarity: {similarity:.02f}%")
+            print(f"Iterations: {iteration}  Changes: {changes}  Similarity: {similarity:.02f}%")
+        if iteration % plot_iteration == 0 and plot:
+            updated_image.set_data(image)
+            plt.suptitle(f"Iterations: {iteration}  Changes: {changes}  Similarity: {similarity:.02f}%")
+            hours, minutes, seconds = get_time_elapsed(start)
+            text.set_text(f'Time: {hours:02d}:{minutes:02d}:{seconds:02d}')
+            plt.draw()
+            plt.pause(0.00001)
         iteration += 1
-
+    plt.show()
     image.save(f'{directory}/output/{similarity:.02f}_{num_individuals}_{num_sides}_{target_name}')
 
 
@@ -104,6 +137,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--sides", help="Number of sides for the polygon", type=int, default=6)
     parser.add_argument("-i", "--iterations", help="Number of iterations", type=int, default=100000)
     parser.add_argument("-v", "--verbose", help="Print information", action="store_true")
+    parser.add_argument("-p", "--plot", help="Plots optimization", action="store_true")
     args = parser.parse_args()
 
     # Random seed for reproducibility
@@ -120,6 +154,7 @@ if __name__ == "__main__":
         'num_iterations': args.iterations,
         'image': args.image,
         'verbose': args.verbose,
+        'plot': args.plot,
         'directory': path,
     }
 
@@ -129,5 +164,5 @@ if __name__ == "__main__":
     if not os.path.isdir(f'{path}/output'):
         os.mkdir(f'{path}/output')
     os.mkdir(f'{path}/run')
-
+    
     main(params)
