@@ -132,12 +132,12 @@ if __name__ == "__main__":
     # Get arguments
     parser = argparse.ArgumentParser(description="Hill-climbing optimization to represent images using geometric shapes.")
     parser.add_argument("image", help="Path to the image to represent")
-    parser.add_argument("-r", "--random", help="Random seed for the number generation", type=int)
-    parser.add_argument("-n", "--number", help="Number of geometric shapes", type=int, default=50)
-    parser.add_argument("-s", "--sides", help="Number of sides for the polygon", type=int, default=6)
     parser.add_argument("-i", "--iterations", help="Number of iterations", type=int, default=100000)
-    parser.add_argument("-v", "--verbose", help="Print information", action="store_true")
-    parser.add_argument("-p", "--plot", help="Plots optimization", action="store_true")
+    parser.add_argument("-n", "--number", help="Number of geometric shapes", type=int, default=50)
+    parser.add_argument("-p", "--plot", help="Plots best image until current generation", action="store_true")
+    parser.add_argument("-r", "--random", help="Random seed for the number generation", type=int)
+    parser.add_argument("-s", "--sides", help="Number of sides for the polygons", type=int, default=6)
+    parser.add_argument("-v", "--verbose", help="Prints current iteration, number of changes and similarity", action="store_true")
     args = parser.parse_args()
 
     # Random seed for reproducibility
