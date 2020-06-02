@@ -7,7 +7,7 @@ import time
 from PIL import Image, ImageDraw, ImageChops
 
 
-def create_population(num_individuals, size, num_sides):
+def create_population_polygons(num_individuals, size, num_sides):
     population = np.zeros((num_individuals, 2 * num_sides + 4))
     population[:, ::2] = np.random.randint(size[0], size=population[:, ::2].shape)
     population[:, 1::2] = np.random.randint(size[1], size=population[:, 1::2].shape)
@@ -15,7 +15,7 @@ def create_population(num_individuals, size, num_sides):
     return population
 
 
-def render_image(population, size, num_sides):
+def render_image_polygons(population, size, num_sides):
     canvas = Image.new('RGB', size, color=(255, 255, 255))
     for individual in population:
         draw = ImageDraw.Draw(canvas, 'RGBA')
@@ -25,22 +25,52 @@ def render_image(population, size, num_sides):
     return canvas
 
 
-def change_individual(individual, size, num_sides):
-    random_pos = np.random.randint(len(individual))
-    if random_pos < 2 * num_sides:
-        if random_pos % 2 == 0:
-            individual[random_pos] = np.random.randint(size[0])
-        else:
-            individual[random_pos] = np.random.randint(size[1])
-    else:
-        individual[random_pos] = np.random.randint(256)
-    return individual
-
-
-def change_population(population, size, num_sides):
+def change_population_polygons(population, size, num_sides):
     new_population = population.copy()
     random_individual = np.random.randint(population.shape[0])
-    new_population[random_individual] = change_individual(new_population[random_individual], size, num_sides)
+    random_pos = np.random.randint(population.shape[1])
+    if random_pos < 2 * num_sides:
+        if random_pos % 2 == 0:
+            new_population[random_individual][random_pos] = np.random.randint(size[0])
+        else:
+            new_population[random_individual][random_pos] = np.random.randint(size[1])
+    else:
+        new_population[random_individual][random_pos] = np.random.randint(256)
+    return new_population
+
+
+def create_population_circles(num_individuals, size, max_radius):
+    population = np.zeros((num_individuals, 7))
+    population[:, 0] = np.random.randint(size[0], size=population[:, 0].shape)
+    population[:, 1] = np.random.randint(size[1], size=population[:, 1].shape)
+    population[:, 2] = np.random.randint(max_radius, size=population[:, 2].shape) 
+    population[:, 3:7] = np.random.randint(256, size=population[:, 3:7].shape)
+    return population
+
+
+def render_image_circles(population, size, _max_radius):
+    canvas = Image.new('RGB', size, color=(255, 255, 255))
+    for individual in population:
+        draw = ImageDraw.Draw(canvas, 'RGBA')
+        x, y = tuple(individual[:2].astype(int))
+        radius = individual[2].astype(int)
+        color = tuple(individual[3:].astype(int))
+        draw.ellipse((x-radius, y-radius, x+radius, y+radius), color)
+    return canvas
+
+
+def change_population_circles(population, size, max_radius):
+    new_population = population.copy()
+    random_individual = np.random.randint(population.shape[0])
+    random_pos = np.random.randint(population.shape[1])
+    if random_pos == 0:
+        new_population[random_individual][random_pos] = np.random.randint(size[0])
+    elif random_pos == 1:
+        new_population[random_individual][random_pos] = np.random.randint(size[1])
+    elif random_pos == 2:
+        new_population[random_individual][random_pos] = np.random.randint(max_radius)
+    else:
+        new_population[random_individual][random_pos] = np.random.randint(256)
     return new_population
 
 
@@ -61,9 +91,11 @@ def get_time_elapsed(start):
 def main(params):
 
     # Unpack parameters
+    is_circle = params['is_circle']
     num_individuals = params['num_individuals']
     num_sides = params['num_sides']
     num_iterations = params['num_iterations']
+    max_radius = params['max_radius']
     image = params['image']
     verbose = params['verbose']
     plot = params['plot']
@@ -73,14 +105,24 @@ def main(params):
     target_name = image.split('/')[-1]
     target = Image.open(image).convert('RGB')
     target.save(f'{directory}/run/target.png')
-
-    # Get image size
     size = target.size
+
+    # Define functions according to shape
+    if is_circle:
+        create_population = create_population_circles
+        render_image = render_image_circles
+        change_population = change_population_circles
+        geometry_params = (size, max_radius)
+    else:
+        create_population = create_population_polygons
+        render_image = render_image_polygons
+        change_population = change_population_polygons
+        geometry_params = (size, num_sides)
 
     # Initial image
     max_difference = np.prod(np.array(target).shape) * 255
-    population = create_population(num_individuals, size, num_sides)
-    image = render_image(population, size, num_sides)
+    population = create_population(num_individuals, *geometry_params)
+    image = render_image(population, *geometry_params)
     similarity = compute_similarity(target, image, max_difference)
 
     # Main loop
@@ -104,8 +146,8 @@ def main(params):
         start = time.time()
 
     while iteration <= num_iterations:
-        new_population = change_population(population, size, num_sides)
-        new_image = render_image(new_population, size, num_sides)
+        new_population = change_population(population, *geometry_params)
+        new_image = render_image(new_population, *geometry_params)
         new_similarity = compute_similarity(target, new_image, max_difference)
         if new_similarity > similarity:
             similarity = new_similarity
@@ -132,7 +174,9 @@ if __name__ == "__main__":
     # Get arguments
     parser = argparse.ArgumentParser(description="Hill-climbing optimization to represent images using geometric shapes.")
     parser.add_argument("image", help="Path to the image to represent")
+    parser.add_argument("-c", "--circle", help="Uses circles instead of polygons", action="store_true")
     parser.add_argument("-i", "--iterations", help="Number of iterations", type=int, default=100000)
+    parser.add_argument("-m", "--maxradius", help="Specifies the maximum radius of circles", type=int, default=30)
     parser.add_argument("-n", "--number", help="Number of geometric shapes", type=int, default=50)
     parser.add_argument("-p", "--plot", help="Plots best image until current generation", action="store_true")
     parser.add_argument("-r", "--random", help="Random seed for the number generation", type=int)
@@ -149,9 +193,11 @@ if __name__ == "__main__":
 
     # Parameters
     params = {
+        'is_circle': args.circle,
         'num_individuals': args.number,
         'num_sides': args.sides,
         'num_iterations': args.iterations,
+        'max_radius': args.maxradius,
         'image': args.image,
         'verbose': args.verbose,
         'plot': args.plot,
