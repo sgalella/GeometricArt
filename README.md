@@ -6,14 +6,34 @@ Hill-climbing optimization for representing images using semitransparent geometr
 </p>
 
 
+## How does it work?
+
+The optimization starts by generating polygons or circles on the canvas. In each iteration, we will change the value of the position or color of a shape selected randomly. If the change produces a more similar image, we keep it. Otherwise, we discard it. By accumulating changes through iterations, we achieve a final image with a high resemblance to the target.
+
+To calculate how good is an image, we render it and calculate its similarity to the target. First, we calculate pixel differences by subtracting both images, doing their absolute value and adding through channels, rows, and columns:
+
+<p align="center">
+    <img width="600" height="350" src="images/difference.gif">
+</p>
+
+We can calculate the similarity dividing the obtained difference by the maximal possible. We can arrange it to give a percentage ranging from 0% (maximal difference) to 100% (same images).
+
+
 
 ## Examples
 
-Left original, right generated. All images were created using 300,000 iterations and 50 polygons. The number of sides was kept fixed at 6. Percentage above represents the similarity between the original and the generated. The similarity is computed as the absolute difference between each pixel. 
+Images on the left are the targets, images on the right are ones generated. All images were created using 300,000 iterations and 50 **polygons**. The number of sides was kept fixed at 6. Percentage above represents the similarity between the original and the generated. 
 
 <p align="center">
-    <img width="800" height="350" src="images/gallery.png">
+    <img width="800" height="350" src="images/examples_polygons.png">
 </p>
+
+The same images reproduced with **circles**. All images were created using 100,000 iterations and 100 circles.
+
+<p align="center">
+    <img width="800" height="350" src="images/examples_circles.png">
+</p>
+
 
 
 ## Installation
