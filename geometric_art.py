@@ -8,6 +8,17 @@ from PIL import Image, ImageDraw, ImageChops
 
 
 def create_population_polygons(num_individuals, size, num_sides):
+    """
+    Initializes the population of polygons in random positions.
+
+    Args:
+        num_individuals (int): Number of polygons in the canvas.
+        size (int): Dimensions on the canvas.
+        num_sides (int): Number of sides for all polygons.
+
+    Returns:
+        np.array: Array containing different individuals.
+    """
     population = np.zeros((num_individuals, 2 * num_sides + 4))
     population[:, ::2] = np.random.randint(size[0], size=population[:, ::2].shape)
     population[:, 1::2] = np.random.randint(size[1], size=population[:, 1::2].shape)
@@ -16,6 +27,17 @@ def create_population_polygons(num_individuals, size, num_sides):
 
 
 def render_image_polygons(population, size, num_sides):
+    """
+    Draws each polygon on the canvas.
+
+    Args:
+        population (np.array): Array containing different individuals.
+        size (int): Dimensions on the canvas.
+        num_sides (int): Number of sides for all polygons.
+
+    Returns:
+       Image : Canvas with polygons on it.
+    """
     canvas = Image.new('RGB', size, color=(255, 255, 255))
     for individual in population:
         draw = ImageDraw.Draw(canvas, 'RGBA')
@@ -26,6 +48,17 @@ def render_image_polygons(population, size, num_sides):
 
 
 def change_population_polygons(population, size, num_sides):
+    """
+    Changes an individual from the population.
+
+    Args:
+        population (np.array): Array containing different individuals.
+        size (int): Dimensions on the canvas.
+        num_sides (int): Number of sides for all polygons.
+
+    Returns:
+        np.array: Contains population with one individual changed randomly.
+    """
     new_population = population.copy()
     random_individual = np.random.randint(population.shape[0])
     random_pos = np.random.randint(population.shape[1])
@@ -40,26 +73,59 @@ def change_population_polygons(population, size, num_sides):
 
 
 def create_population_circles(num_individuals, size, max_radius):
+    """
+    Initializes the population of  in random positions.
+
+    Args:
+        num_individuals (int): Number of polygons in the canvas.
+        size (int): Dimensions on the canvas.
+        max_radius (int): Maximum possible radius.
+
+    Returns:
+        np.array: Array containing different individuals.
+    """
     population = np.zeros((num_individuals, 7))
     population[:, 0] = np.random.randint(size[0], size=population[:, 0].shape)
     population[:, 1] = np.random.randint(size[1], size=population[:, 1].shape)
-    population[:, 2] = np.random.randint(max_radius, size=population[:, 2].shape) 
+    population[:, 2] = np.random.randint(max_radius, size=population[:, 2].shape)
     population[:, 3:7] = np.random.randint(256, size=population[:, 3:7].shape)
     return population
 
 
 def render_image_circles(population, size, _max_radius):
+    """
+    Draws each circle on the canvas.
+
+    Args:
+        population (np.array): Array containing different individuals.
+        size (int): Dimensions on the canvas.
+        _max_radius (int): Maximum possible radius.
+
+    Returns:
+        Image: Canvas with circles on it.
+    """
     canvas = Image.new('RGB', size, color=(255, 255, 255))
     for individual in population:
         draw = ImageDraw.Draw(canvas, 'RGBA')
         x, y = tuple(individual[:2].astype(int))
         radius = individual[2].astype(int)
         color = tuple(individual[3:].astype(int))
-        draw.ellipse((x-radius, y-radius, x+radius, y+radius), color)
+        draw.ellipse((x - radius, y - radius, x + radius, y + radius), color)
     return canvas
 
 
 def change_population_circles(population, size, max_radius):
+    """
+    Changes an individual from the population.
+
+    Args:
+        population (np.array): Array containing different individuals.
+        size (int): Dimensions on the canvas.
+        max_radius (int): Maximum possible radius.
+
+    Returns:
+        np.array: Contains population with one individual changed randomly.
+    """
     new_population = population.copy()
     random_individual = np.random.randint(population.shape[0])
     random_pos = np.random.randint(population.shape[1])
@@ -75,12 +141,32 @@ def change_population_circles(population, size, max_radius):
 
 
 def compute_similarity(target, output, max_difference):
+    """
+   Compares the target and the generated image.
+
+    Args:
+        target (np.array): Objective image.
+        output (np.array): Image generated randomly.
+        max_difference (int): Maximum possible difference.
+
+    Returns:
+        float: Difference between the images (in the range between 0 and 1).
+    """
     difference = np.sum(ImageChops.difference(target, output))
     similarity = 100 * (1 - (difference / max_difference))
     return similarity
 
 
 def get_time_elapsed(start):
+    """
+    Calculates the time elapsed of the algorithm.
+
+    Args:
+        start (time): Onset of timer.
+
+    Returns:
+        tuple: Values of time split in hours, minutes and seconds.
+    """
     end = time.time()
     seconds = round(end - start)
     hours, seconds = seconds // 3600, seconds % 3600
@@ -89,7 +175,7 @@ def get_time_elapsed(start):
 
 
 def main(params):
-
+    """ Runs the algorithm. """
     # Unpack parameters
     is_circle = params['is_circle']
     num_individuals = params['num_individuals']
@@ -210,5 +296,5 @@ if __name__ == "__main__":
     if not os.path.isdir(f'{path}/output'):
         os.mkdir(f'{path}/output')
     os.mkdir(f'{path}/run')
-    
+
     main(params)
