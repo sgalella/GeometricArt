@@ -66,7 +66,7 @@ Additionally, you can change the parameters by adding the corresponding flag and
 | :----------------: | :--------------------------------------------------------: | :-----: |
 |   _-c, --circle_   |              Uses circles instead of polygons              |  False  |
 |    _-h, --help_    |       Displays information and flags of the program        |    –    |
-| _-i, --iterations_ |                    Number of iterations                    | 1000000 |
+| _-i, --iterations_ |                    Number of iterations                    | 100000  |
 | _-m, --maxradius_  |          Specifies the maximum radius of circles           |   30    |
 |   _-n, --number_   |                 Number of geometric shapes                 |   50    |
 |    _-p, --plot_    |         Plots best image until current generation          |  False  |
