@@ -7,9 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
-from .geometric_art import CirclePopulation, CircleRenderer
-from .geometric_art import PolygonPopulation, PolygonRenderer
-from .geometric_art import compute_similarity, get_time_elapsed
+from .shapes import CirclePopulation, PolygonPopulation, compute_similarity, get_time_elapsed
+from .renderer import CircleRenderer, PolygonRenderer
 
 
 # Get arguments
