@@ -51,13 +51,13 @@ pip install -r requirements.txt
 Run the program as:
 
 ```bash
-python geometric_art.py path-to-image
+python -m geometric_art.py path-to-image
 ```
 
 By default, the program uses polygons. Alternatively, if you want to use circles run:
 
 ```bash
-python geometric_art.py path-to-image -c
+python -m geometric_art.py path-to-image -c
 ```
 
 Additionally, you can change the parameters by adding the corresponding flag and value (if integer):
