@@ -32,18 +32,16 @@ if args.random:
 # Directory path
 path = os.getcwd()
 
-# Parameters
-params = {
-    'is_circle': args.circle,
-    'num_individuals': args.number,
-    'num_sides': args.sides,
-    'num_iterations': args.iterations,
-    'max_radius': args.maxradius,
-    'image': args.image,
-    'verbose': args.verbose,
-    'plot': args.plot,
-    'directory': path,
-}
+# Get parameters from command line
+is_circle = args.circle
+num_individuals = args.number
+num_sides = args.sides
+num_iterations = args.iterations
+max_radius = args.maxradius
+image = args.image
+verbose = args.verbose
+plot = args.plot
+directory = path
 
 # Create folders to store temporal and generated images
 if os.path.isdir(f'{path}/run'):
@@ -51,18 +49,6 @@ if os.path.isdir(f'{path}/run'):
 if not os.path.isdir(f'{path}/output'):
     os.mkdir(f'{path}/output')
 os.mkdir(f'{path}/run')
-
-""" Runs the algorithm. """
-# Unpack parameters
-is_circle = params['is_circle']
-num_individuals = params['num_individuals']
-num_sides = params['num_sides']
-num_iterations = params['num_iterations']
-max_radius = params['max_radius']
-image = params['image']
-verbose = params['verbose']
-plot = params['plot']
-directory = params['directory']
 
 # Load target
 target_name = image.split('/')[-1]
