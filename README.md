@@ -1,5 +1,5 @@
 # Geometric Art
-Hill-climbing optimization for representing images using semitransparent geometric shapes, including polygons and circles. Based on the idea from [Roger Alsing's Genetic Programming: Evolution of Mona Lisa](https://rogerjohansson.blog/2008/12/07/genetic-programming-evolution-of-mona-lisa/) with some improvements from [AlteredQualia's Evolution of Mona Lisa in Javascript](https://alteredqualia.com/visualization/evolve/).
+[Hill climbing optimization](https://en.wikipedia.org/wiki/Hill_climbing) for representing images using semitransparent geometric shapes, including polygons and circles. Based on the idea from [Roger Alsing's Genetic Programming: Evolution of Mona Lisa](https://rogerjohansson.blog/2008/12/07/genetic-programming-evolution-of-mona-lisa/) with some improvements from [AlteredQualia's Evolution of Mona Lisa in Javascript](https://alteredqualia.com/visualization/evolve/).
 
 <p align="center">
     <img width="500" height="300" src="images/geometric_art.gif">
